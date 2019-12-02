@@ -177,6 +177,12 @@ const Node: React.ComponentType<React.ComponentProps<typeof NodeLabel>> = ({
 }) => {
   return (
     <TreeNode
+      className={css`
+        &::before,
+        &::after {
+          top: -4px !important;
+        }
+      `}
       label={
         <NodeLabel fileName={fileName} required={required} fields={fields} />
       }
