@@ -47,11 +47,14 @@ const NodeLabel = ({
     [searchString]
   );
 
+  const fieldHasMatch = (
+    field: typeof requiredFields[0] & typeof optionalFields[0]
+  ) => field.isMatch;
+
   const hasMatch = React.useMemo(() => {
-    const isMatch = (
-      field: typeof requiredFields[0] & typeof optionalFields[0]
-    ) => field.isMatch;
-    return requiredFields.some(isMatch) || optionalFields.some(isMatch);
+    return (
+      requiredFields.some(fieldHasMatch) || optionalFields.some(fieldHasMatch)
+    );
   }, [searchString]);
 
   React.useEffect(() => {
@@ -107,7 +110,13 @@ const NodeLabel = ({
               background: ${theme.colors.primary_1};
             `}
           >
-            {requiredFields.length + optionalFields.length} fields
+            {!!(searchString && searchString.length)
+              ? `${requiredFields.filter(fieldHasMatch).length +
+                  optionalFields.filter(fieldHasMatch).length} / ${
+                  fields.length
+                }`
+              : requiredFields.length + optionalFields.length}{" "}
+            fields
           </Tag>
         </div>
         <Button variant="text" size="sm" onClick={e => setExpanded(!expanded)}>
@@ -199,12 +208,15 @@ const ExampleTree = ({
   const theme = useTheme();
 
   const [zoom, setZoom] = React.useState(1);
+  const scrollContainerRef = React.createRef<HTMLDivElement>();
   const treeContainerRef = React.createRef<HTMLDivElement>();
 
   React.useEffect(() => {
-    if (treeContainerRef.current) {
-      treeContainerRef.current.scroll({
-        left: treeContainerRef.current.offsetWidth / 2
+    const scrollContainer = scrollContainerRef.current;
+    const treeContainer = treeContainerRef.current;
+    if (scrollContainer && treeContainer) {
+      scrollContainer.scroll({
+        left: scrollContainer.scrollWidth / 2 - treeContainer.clientWidth / 2
       });
     }
   }, []);
@@ -220,14 +232,15 @@ const ExampleTree = ({
         onChange={e => setZoom(Number(e.target.value))}
       />
       <div
-        ref={treeContainerRef}
+        ref={scrollContainerRef}
         className={css`
-          border: solid 2px red;
+          /* border: solid 2px red; */
           overflow: scroll;
           height: 1000px;
         `}
       >
         <div
+          ref={treeContainerRef}
           style={{
             transition: "all 0.25s",
             transform: `scale(${zoom})`
