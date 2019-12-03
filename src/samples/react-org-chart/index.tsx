@@ -57,12 +57,16 @@ const NodeLabel = ({
     );
   }, [searchString]);
 
+  const firstUpdate = React.useRef(true);
   React.useEffect(() => {
-    if (hasMatch) {
-      setExpanded(true);
-    } else {
-      setExpanded(false);
+    if (!firstUpdate.current) {
+      if (hasMatch) {
+        setExpanded(true);
+      } else {
+        setExpanded(false);
+      }
     }
+    firstUpdate.current = false;
   }, [searchString]);
 
   const ListItem = styled("li")`
@@ -206,10 +210,10 @@ const FileNode = ({ fileDef }: { fileDef: FileDef }) => (
 
 const ExampleTree = ({
   searchString,
-  rootFile = data
+  rootFile
 }: {
   searchString: string;
-  rootFile?: FileDef;
+  rootFile: FileDef;
 }) => {
   const theme = useTheme();
 
@@ -242,7 +246,7 @@ const ExampleTree = ({
         className={css`
           /* border: solid 2px red; */
           overflow: scroll;
-          height: 1000px;
+          height: 800px;
         `}
       >
         <div
